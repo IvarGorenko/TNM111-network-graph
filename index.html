@@ -2,7 +2,7 @@
 <html>
     <head>
         <script src="https://d3js.org/d3.v7.min.js"></script>
-        <script src="nodelink.js"></script>
+
         <link rel="stylesheet" href="style.css">
     </head>
     <body>
@@ -18,21 +18,24 @@
                     </svg>
                 </div>
                 <div id ="control1">
-                    <p>Controls for graph 1:</p>
+                    <h2>Controls for graph 1:</h2>
+                    <p>Character frequency range </p>
+                    <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
                 </div>
             </div>
             <div id="graph2">
                 <div id="view2">
                     <svg width="800" height="500">
-                        <g class="links1"></g>
-                        <g class="nodes1"></g>
+                        <g class="links2"></g>
+                        <g class="nodes2"></g>
                     </svg>
                 </div>
                 <div id ="control2">
-                    <p>Controls for graph 2:</p>
+                    <h2>Controls for graph 2:</h2>
                 </div>
             </div>
         </div> 
-
+                  
+        <script src="nodelink.js"></script>
     </body>
 </html>

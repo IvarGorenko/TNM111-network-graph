@@ -1,74 +1,66 @@
 var width = 800, height = 500
-var clickState = 0;
+var clickedNode;
 
 var nodes = [];
 var links = [];
 
-var nodes1 = [
-	{name: 'A'},
-	{name: 'B'},
-	{name: 'C'},
-	{name: 'D'},
-	{name: 'E'},
-	{name: 'F'},
-	{name: 'G'},
-	{name: 'Hdsadf'},
-]
+var nodes2 = [];
+var links2 = [];
 
-var links1 = [
-	{source: 0, target: 1},
-	{source: 0, target: 2},
-	{source: 0, target: 3},
-	{source: 1, target: 6},
-	{source: 3, target: 4},
-	{source: 3, target: 7},
-	{source: 4, target: 5},
-	{source: 4, target: 7}
-]
+var Tooltip = d3.select(".container")
+    .append("div")
+    .style("opacity", 0)
+    .attr("class", "tooltip")
+    .style("background-color", "white")
+    .style("border", "solid")
+    .style("border-width", "2px")
+    .style("border-radius", "5px")
+    .style("padding", "5px")
 
-var starWarsData = "starwars";
+var starWarsData1 = "starwars";
 
-d3.json("/starwars-interactions/starwars-episode-1-interactions-allCharacters.json",).then(function(data){
-	starWarsData = data;
-	console.log(starWarsData);
-	nodes = starWarsData.nodes;
-	links = starWarsData.links;
+
+d3.json("/starwars-interactions/starwars-episode-2-interactions-allCharacters.json",).then(function(data){
+	starWarsData1 = data;
+	console.log(starWarsData1);
+	nodes = starWarsData1.nodes;
+	links = starWarsData1.links;
 	var simulation = d3.forceSimulation(nodes)
 	.force('charge', d3.forceManyBody().strength(-300))
 	.force('center', d3.forceCenter(width / 2, height / 2))
 	.force('link', d3.forceLink().links(links))
-	.on('tick', ticked);
+	.on('tick', function(d) {
+		ticked('.nodes',nodes,'.links',links);
+	})
+});
+
+var starWarsData2 = "starwars";
+
+d3.json("/starwars-interactions/starwars-episode-1-interactions-allCharacters.json",).then(function(data){
+	starWarsData2 = data;
+	console.log(starWarsData2);
+	nodes2 = starWarsData2.nodes;
+	links2 = starWarsData2.links;
+	var simulation = d3.forceSimulation(nodes2)
+	.force('charge', d3.forceManyBody().strength(-300))
+	.force('center', d3.forceCenter(width / 2, height / 2))
+	.force('link', d3.forceLink().links(links2))
+	.on('tick', function(d) {
+		ticked('.nodes2',nodes2,'.links2',links2);
+		})
 });
 
 
-var simulation1 = d3.forceSimulation(nodes1)
-.force('charge', d3.forceManyBody().strength(-100))
-.force('center', d3.forceCenter(width / 2, height / 2))
-.force('link', d3.forceLink().links(links1))
-.on('tick', ticked);
-
-function updateLinks() {
-	var u = d3.select('.links')
+function updateLinks(links_name,lnk) {
+	u = d3.select(links_name)
 		.selectAll('line')
-		.data(links)
+		.data(lnk)
 		.join('line')
-		.attr('x1', function(d) {
-			return d.source.x
+		.style('stroke-width',function(d){
+			return d.value;
 		})
-		.attr('y1', function(d) {
-			return d.source.y
-		})
-		.attr('x2', function(d) {
-			return d.target.x
-		})
-		.attr('y2', function(d) {
-			return d.target.y
-		});
-
-    var v = d3.select('.links1')
-		.selectAll('line')
-		.data(links1)
-		.join('line')
+		.attr('stroke','#000000')
+		.attr('opacity',0.5)
 		.attr('x1', function(d) {
 			return d.source.x
 		})
@@ -83,13 +75,13 @@ function updateLinks() {
 		});
 }
 
-function updateNodes() {
-	u = d3.select('.nodes')
+function updateNodes(nodes_name,nd,lnk) {
+	var u = d3.select(nodes_name) 
 		.selectAll('circle')
-		.data(nodes)
+		.data(nd)
 		.join('circle')
 		.attr('r', function(d){
-			return d.value*0.5;
+			return d3.max([d.value*0.7,5]);
 		})
 		.attr('fill',function(d){
 			return d.colour
@@ -103,43 +95,59 @@ function updateNodes() {
 		.attr('name', function(d) {
 			return d.name
 		})
+		.attr('value',function(d){
+			return d.value
+		})
+		.on("click", function() {
+			if (clickedNode != d3.select(this).attr('name')) {
+				clickedNode = d3.select(this).attr('name')
+				
+				//node opacity 
+				d3.selectAll('circle')
+				.attr("opacity", function(d) {
+					return (d.name === clickedNode) ? 1 : 0.5;
+				});
+				
+				console.log(d3.selectAll('circle'));
+				//link opacity
+				var nodeColor = d3.select(this).attr('fill');
+				d3.selectAll('line').attr('stroke', function(d){
+					return '#000000';//nodeColor
+				})
 
-		u.on("click", function() {
-			var clickedNode = d3.select(this).attr("name")
-			console.log("Clicked: " + clickedNode);
-			console.log(clickState)
-			u.attr("opacity", function(d) {
-				if (clickState == 0) { // TODO: states funkar inte...
-					clickState = 1;
-					return (d.name == clickedNode) ? 1 : 0.3;
-				} 
-				else {
-					clickState = 0;
-					return 1;
-				}
-					
-			});
-		});
+			} else {
+				clickedNode = ""
 
-    v = d3.select('.nodes1')
-		.selectAll('text')
-		.data(nodes1)
-		.join('text')
-		.text(function(d) {
-			return d.name
+				//node opacity 
+				d3.selectAll('circle')
+				.attr("opacity", function() {
+					return 1
+				});
+				
+				//link opacity
+				var nodeColor = d3.select(this).attr('fill');
+				d3.selectAll('line').attr('stroke','#000000')
+
+
+			}
 		})
-		.attr('x', function(d) {
-			return d.x
+		.on("mouseover", function() {
+			Tooltip.style('opacity', 1)
+			d3.select(this)
+			.style("stroke", "black")
 		})
-		.attr('y', function(d) {
-			return d.y
+		.on("mousemove", function() {
+			Tooltip.html("Name of character: " + d3.select(this).attr('name') + "<br> Scene appearances: " + d3.select(this).attr('value'))
+			
 		})
-		.attr('dy', function(d) {
-			return 5
+		.on("mouseleave", function() {
+			Tooltip.style("opacity", 0)
+			d3.select(this)
+			.style("stroke", "none")
 		});
 }
 
-function ticked() {
-	updateLinks()
-	updateNodes()
+function ticked(nodes_name,nd,links_name,lnk) {
+	updateLinks(links_name,lnk)
+	updateNodes(nodes_name,nd,lnk)
 }
