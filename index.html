@@ -2,40 +2,96 @@
 <html>
     <head>
         <script src="https://d3js.org/d3.v7.min.js"></script>
-
         <link rel="stylesheet" href="style.css">
     </head>
-    <body>
+    <body onload="loadData()">
         <h1>
             Star Wars characters relation network
         </h1>
         <div class="container">
             <div id="graph1">
                 <div id="view1">
-                    <svg width="800" height="500">
+                    <svg id="svg1">
                         <g class="links"></g>
                         <g class="nodes"></g>
                     </svg>
                 </div>
                 <div id ="control1">
-                    <h2>Controls for graph 1:</h2>
-                    <p>Character frequency range </p>
-                    <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+                    <h2>Choose episodes to visualize</h2>
+                    <p>zoom</p>
+                    <input type="range" min="0.5" max="3" value="1" step="any" id="slider1" onchange="zoom(this)">
+                    <label class="boxcont">Episode 1
+                        <input type="checkbox" id="0" checked="checked" onclick="checkbox(this)">
+                        <span class="checkmark"></span>
+                      </label>
+                      <label class="boxcont">Episode 2
+                        <input type="checkbox" id="1" onclick="checkbox(this)">
+                        <span class="checkmark"></span>
+                      </label>
+                      <label class="boxcont">Episode 3
+                        <input type="checkbox" id="2" onclick="checkbox(this)">
+                        <span class="checkmark"></span>
+                      </label>
+                      <label class="boxcont">Episode 4
+                        <input type="checkbox" id="3" onclick="checkbox(this)">
+                        <span class="checkmark"></span>
+                      </label> 
+                      <label class="boxcont">Episode 5
+                        <input type="checkbox" id="4" onclick="checkbox(this)">
+                        <span class="checkmark"></span>
+                      </label>
+                      <label class="boxcont">Episode 6
+                        <input type="checkbox" id="5" onclick="checkbox(this)">
+                        <span class="checkmark"></span>
+                      </label>
+                      <label class="boxcont">Episode 7
+                        <input type="checkbox" id="6" onclick="checkbox(this)">
+                        <span class="checkmark"></span>
+                      </label>
                 </div>
             </div>
             <div id="graph2">
                 <div id="view2">
-                    <svg width="800" height="500">
+                    <svg id="svg2">
                         <g class="links2"></g>
                         <g class="nodes2"></g>
                     </svg>
                 </div>
                 <div id ="control2">
-                    <h2>Controls for graph 2:</h2>
+                    <h2>Choose episodes to visualize</h2>
+                    <p>zoom</p>
+                    <input type="range" min="0.5" max="3" value="1" class="slider" step="any" id="slider2" onchange="zoom(this)">
+                    <label class="boxcont">Episode 1
+                        <input type="checkbox" id="7" onclick="checkbox(this)">
+                        <span class="checkmark"></span>
+                      </label>
+                      <label class="boxcont">Episode 2
+                        <input type="checkbox" id="8" checked="checked" onclick="checkbox(this)">
+                        <span class="checkmark"></span>
+                      </label>
+                      <label class="boxcont">Episode 3
+                        <input type="checkbox" id="9" onclick="checkbox(this)">
+                        <span class="checkmark"></span>
+                      </label>
+                      <label class="boxcont">Episode 4
+                        <input type="checkbox" id="10" onclick="checkbox(this)">
+                        <span class="checkmark"></span>
+                      </label> 
+                      <label class="boxcont">Episode 5
+                        <input type="checkbox" id="11" onclick="checkbox(this)">
+                        <span class="checkmark"></span>
+                      </label>
+                      <label class="boxcont">Episode 6
+                        <input type="checkbox" id="12" onclick="checkbox(this)">
+                        <span class="checkmark"></span>
+                      </label>
+                      <label class="boxcont">Episode 7
+                        <input type="checkbox" id="13" onclick="checkbox(this)">
+                        <span class="checkmark"></span>
+                      </label>
                 </div>
             </div>
         </div> 
-                  
-        <script src="nodelink.js"></script>
+        <script src="nodelink.js"></script> 
     </body>
 </html>
