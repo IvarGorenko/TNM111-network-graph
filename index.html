@@ -5,9 +5,9 @@
         <link rel="stylesheet" href="style.css">
     </head>
     <body onload="loadData()">
-        <h1>
+        <h2>
             Star Wars characters relation network
-        </h1>
+        </h2>
         <div class="container">
             <div id="graph1">
                 <div id="view1">
@@ -17,37 +17,38 @@
                     </svg>
                 </div>
                 <div id ="control1">
-                    <h2>Choose episodes to visualize</h2>
-                    <p>zoom</p>
-                    <input type="range" min="0.5" max="3" value="1" step="any" id="slider1" onchange="zoom(this)">
-                    <label class="boxcont">Episode 1
-                        <input type="checkbox" id="0" checked="checked" onclick="checkbox(this)">
-                        <span class="checkmark"></span>
-                      </label>
-                      <label class="boxcont">Episode 2
-                        <input type="checkbox" id="1" onclick="checkbox(this)">
-                        <span class="checkmark"></span>
-                      </label>
-                      <label class="boxcont">Episode 3
-                        <input type="checkbox" id="2" onclick="checkbox(this)">
-                        <span class="checkmark"></span>
-                      </label>
-                      <label class="boxcont">Episode 4
-                        <input type="checkbox" id="3" onclick="checkbox(this)">
-                        <span class="checkmark"></span>
-                      </label> 
-                      <label class="boxcont">Episode 5
-                        <input type="checkbox" id="4" onclick="checkbox(this)">
-                        <span class="checkmark"></span>
-                      </label>
-                      <label class="boxcont">Episode 6
-                        <input type="checkbox" id="5" onclick="checkbox(this)">
-                        <span class="checkmark"></span>
-                      </label>
-                      <label class="boxcont">Episode 7
-                        <input type="checkbox" id="6" onclick="checkbox(this)">
-                        <span class="checkmark"></span>
-                      </label>
+                  <h2>Choose episodes to visualize</h2>
+                  <label class="boxcont">Episode 1
+                    <input type="checkbox" id="0" checked="checked" onclick="checkbox(this)">
+                    <span class="checkmark"></span>
+                  </label>
+                  <label class="boxcont">Episode 2
+                    <input type="checkbox" id="1" onclick="checkbox(this)">
+                    <span class="checkmark"></span>
+                  </label>
+                  <label class="boxcont">Episode 3
+                    <input type="checkbox" id="2" onclick="checkbox(this)">
+                    <span class="checkmark"></span>
+                  </label>
+                  <label class="boxcont">Episode 4
+                    <input type="checkbox" id="3" onclick="checkbox(this)">
+                    <span class="checkmark"></span>
+                  </label> 
+                  <label class="boxcont">Episode 5
+                    <input type="checkbox" id="4" onclick="checkbox(this)">
+                    <span class="checkmark"></span>
+                  </label>
+                  <label class="boxcont">Episode 6
+                    <input type="checkbox" id="5" onclick="checkbox(this)">
+                    <span class="checkmark"></span>
+                  </label>
+                  <label class="boxcont">Episode 7
+                    <input type="checkbox" id="6" onclick="checkbox(this)">
+                    <span class="checkmark"></span>
+                  </label>
+                  <h3> Minimum amount of scene appearences</h3>
+                  <input type="range" min ="1" max="100" value="1" id="filterslider1" onchange="updateFilter(this)" oninput="sliderIn(this)">
+                  <div id="slider1text"> 1 </div>
                 </div>
             </div>
             <div id="graph2">
@@ -58,37 +59,38 @@
                     </svg>
                 </div>
                 <div id ="control2">
-                    <h2>Choose episodes to visualize</h2>
-                    <p>zoom</p>
-                    <input type="range" min="0.5" max="3" value="1" class="slider" step="any" id="slider2" onchange="zoom(this)">
-                    <label class="boxcont">Episode 1
-                        <input type="checkbox" id="7" onclick="checkbox(this)">
-                        <span class="checkmark"></span>
-                      </label>
-                      <label class="boxcont">Episode 2
-                        <input type="checkbox" id="8" checked="checked" onclick="checkbox(this)">
-                        <span class="checkmark"></span>
-                      </label>
-                      <label class="boxcont">Episode 3
-                        <input type="checkbox" id="9" onclick="checkbox(this)">
-                        <span class="checkmark"></span>
-                      </label>
-                      <label class="boxcont">Episode 4
-                        <input type="checkbox" id="10" onclick="checkbox(this)">
-                        <span class="checkmark"></span>
-                      </label> 
-                      <label class="boxcont">Episode 5
-                        <input type="checkbox" id="11" onclick="checkbox(this)">
-                        <span class="checkmark"></span>
-                      </label>
-                      <label class="boxcont">Episode 6
-                        <input type="checkbox" id="12" onclick="checkbox(this)">
-                        <span class="checkmark"></span>
-                      </label>
-                      <label class="boxcont">Episode 7
-                        <input type="checkbox" id="13" onclick="checkbox(this)">
-                        <span class="checkmark"></span>
-                      </label>
+                  <h2>Choose episodes to visualize</h2>
+                  <label class="boxcont">Episode 1
+                    <input type="checkbox" id="7" onclick="checkbox(this)">
+                    <span class="checkmark"></span>
+                  </label>
+                  <label class="boxcont">Episode 2
+                    <input type="checkbox" id="8" checked="checked" onclick="checkbox(this)">
+                    <span class="checkmark"></span>
+                  </label>
+                  <label class="boxcont">Episode 3
+                    <input type="checkbox" id="9" onclick="checkbox(this)">
+                    <span class="checkmark"></span>
+                  </label>
+                  <label class="boxcont">Episode 4
+                    <input type="checkbox" id="10" onclick="checkbox(this)">
+                    <span class="checkmark"></span>
+                  </label> 
+                  <label class="boxcont">Episode 5
+                    <input type="checkbox" id="11" onclick="checkbox(this)">
+                    <span class="checkmark"></span>
+                  </label>
+                  <label class="boxcont">Episode 6
+                    <input type="checkbox" id="12" onclick="checkbox(this)">
+                    <span class="checkmark"></span>
+                  </label>
+                  <label class="boxcont">Episode 7
+                    <input type="checkbox" id="13" onclick="checkbox(this)">
+                    <span class="checkmark"></span>
+                  </label>
+                  <h3> Minimum amount of scene appearences</h3>
+                  <input type="range" min ="1" max="100" value="1" id="filterslider2" onchange="updateFilter(this)" oninput="sliderIn(this)">
+                  <div id="slider2text"> 1 </div>
                 </div>
             </div>
         </div> 

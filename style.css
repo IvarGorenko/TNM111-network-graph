@@ -20,7 +20,7 @@
   #graph1 {
     border: 3px solid #bbb;
     display: flex;
-    max-height: 45vh;
+    max-height: 45%;
   }
 
   #graph2 {
@@ -28,28 +28,31 @@
     border-right: 3px solid #bbb;
     border-bottom: 3px solid #bbb;
     display: flex;
-    max-height: 45vh;
+    max-height: 45%;
   }
 
   #view1 {
     float: left;
     width: 70%;
-    max-height: 45vh;
+    max-height: 45%;
     border: 3px solid #000000;
-    overflow: scroll;
+    overflow: hidden;
+    align-items: center;
   }
 
   #view2 {
     float: left;
     width: 70%;
-    max-height: 45vh;
+    max-height: 45%;
     border: 3px solid #000000;
-    overflow: scroll;
+    overflow: hidden;
+    align-items: center;
 
   }
 
   #control1 {
    width: 30%;
+   height: 45vh;
    border: 3px solid #ff0000;
    display: flex;
    flex-direction: column;
@@ -59,6 +62,7 @@
 
   #control2 {
     width: 30%;
+    height: 45vh;
     text-align: center;
     border: 3px solid #ff0000;
     display: flex;
@@ -68,13 +72,15 @@
   }
 
   #svg1 {
-    height: 100vh;
-    width: 100vh;
+    height: 100%;
+    width: 100%;
+    z-index: 1;
   }
 
   #svg2 {
-    height: 100vh;
-    width: 100vh;
+    height: 100%;
+    width: 100%;
+    z-index: 2;
   }
 
    /* Customize the label (the container) */

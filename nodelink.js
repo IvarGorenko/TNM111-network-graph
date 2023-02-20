@@ -1,5 +1,6 @@
-var width = 1000, height = 1000
-var clickedNode;
+var width = 2000, height = 1200
+var clickedNode = "";
+var nodeColor = "#000000";
 
 var nodes = [];
 var links = [];
@@ -18,11 +19,46 @@ var Tooltip = d3.select(".container")
 	.style("position", "absolute")
     .style("padding", "5px");
 
-var zoom1 = d3.select("#svg1").style("transform", "scale(1)")
-var zoom2 = d3.select("#svg2").style("transform", "scale(1)")
+let zoom1 = d3.zoom()
+	.on('zoom', handleZoom)
+	.scaleExtent([0.5, 1.5])
+	.translateExtent([[0, 0], [width * 3, height * 3]]);
+  
+  let zoom2 = d3.zoom()
+	  .on('zoom', handleZoom)
+	  .scaleExtent([0.5, 1.5])
+	  .translateExtent([[0, 0], [width * 3, height * 3]]);
+  
+  
+  
+  function handleZoom(e) {
+	//console.log(e);
+	  // console.log(e.sourceEvent.target.id);
+	  if (e.sourceEvent.target.id === "svg1") {
+		  d3.select('.nodes')
+			  .attr('transform', e.transform);
+		  d3.select('.links')
+			  .attr('transform', e.transform);
+	  } else if (e.sourceEvent.target.id === "svg2") {
+			d3.select('.nodes2')
+				.attr('transform', e.transform);
+			d3.select('.links2')
+				.attr('transform', e.transform);
+	  } else {
+		  return
+	  }
+  }
+  
+  function initZoom() {
+	d3.selectAll('svg')
+	  .call(zoom1)
+	  .call(zoom1.transform, d3.zoomIdentity.scale(0.5))
+	  .call(zoom2)
+	  .call(zoom2.transform, d3.zoomIdentity.scale(0.5))
+	  .on("dblclick.zoom", null);
+  
+  }
 	
-var filepath1 = "/starwars-interactions/starwars-full-interactions-allCharacters.json";
-
 var showEpisode = [true,false,false,false,false,false,false,false,true,false,false,false,false,false];
 //var showEpisode = [true,true,true,true,true,true,true,true,true,true,true,true,true,true];
 
@@ -35,9 +71,22 @@ var mergedData2 = {
 	links: []
 };
 
+var simulation1 = d3.forceSimulation(nodes);
+var simulation2 = d3.forceSimulation(nodes2);
+
+var min_appearences_thr1 = 0;
+var min_appearences_thr2 = 0;  
 function loadData(){	
-	d3.selectAll("circle").remove();
-	d3.selectAll("line").remove();
+	d3.selectAll("g").selectChildren().remove();
+	simulation1.stop();
+	simulation2.stop();
+
+	mergedData1.nodes = [];
+	mergedData1.links = [];
+	
+	mergedData2.nodes = [];
+	mergedData2.links = [];
+
 	Promise.all([
 		d3.json("/starwars-interactions/starwars-episode-1-interactions-allCharacters.json"),
 		d3.json("/starwars-interactions/starwars-episode-2-interactions-allCharacters.json"),
@@ -49,7 +98,7 @@ function loadData(){
 	]).then(function(data){
 		for(var episode = 0;episode < 7;episode++){
 			if(showEpisode[episode]){
-				//nodes 
+				//nodes for first graph 
 				data[episode].nodes.forEach(node => {
 					node_found = mergedData1.nodes.findIndex((elem) =>{
 						return elem.name === node.name;
@@ -60,33 +109,10 @@ function loadData(){
 						mergedData1.nodes[node_found].value += node.value;
 					}
 				});
-				// links 
-				data[episode].links.forEach(link =>{
 
-					link_source = mergedData1.nodes.findIndex((elem) =>{ 
-						return elem.name === data[episode].nodes[link.source].name;
-					})
-					link_target = mergedData1.nodes.findIndex((elem) =>{ 
-						return elem.name === data[episode].nodes[link.target].name;
-					})
-					link_found = mergedData1.links.findIndex((elem) =>{
-						return (elem.source === link_source && elem.target === link_target) || (elem.source === link_target && elem.target === link_source);
-					})
-					//console.log(link_source);
-					//console.log(link_target);
-					if(link_found === -1){
-						mergedData1.links.push({
-							"source": link_source,
-							"target": link_target,
-							"value": link.value
-						});
-					}else{
-						mergedData1.links[link_found].value += link.value;
-					}
-				})
 			}
 			if(showEpisode[7+episode]){
-				//nodes 
+				//nodes for second graph 
 				data[episode].nodes.forEach(node => {
 					node_found = mergedData2.nodes.findIndex((elem) =>{
 						return elem.name === node.name;
@@ -97,9 +123,70 @@ function loadData(){
 						mergedData2.nodes[node_found].value += node.value;
 					}
 				});
-				// links 
-				data[episode].links.forEach(link =>{
+	
+			}
+		}
 
+		//Filtering 1  
+		var slider1 =  document.getElementById("filterslider1")
+		slider1.max = Math.max.apply(Math, mergedData1.nodes.map(function(node) {return node.value}))
+		//console.log(slider1);
+		mergedData1.nodes = mergedData1.nodes.filter((node)=>{
+			if (node.value < min_appearences_thr1){
+				console.log("remove node");
+			}
+			return node.value >= min_appearences_thr1;
+		})
+
+		//Filtering 2
+		var slider2 =  document.getElementById("filterslider2")
+		slider2.max = Math.max.apply(Math, mergedData2.nodes.map(function(node) {return node.value}))
+		//console.log(slider2);
+		mergedData2.nodes = mergedData2.nodes.filter((node)=>{
+			if (node.value < min_appearences_thr1){
+				console.log("remove node");
+			}
+			return node.value >= min_appearences_thr2;
+		})
+
+
+		for(var episode = 0;episode < 7;episode++){
+			if(showEpisode[episode]){
+
+				// links for first graph 
+				data[episode].links.forEach(link =>{
+					
+					link_source = mergedData1.nodes.findIndex((elem) =>{ 
+						return elem.name === data[episode].nodes[link.source].name;
+					})
+					link_target = mergedData1.nodes.findIndex((elem) =>{ 
+						return elem.name === data[episode].nodes[link.target].name;
+					})
+					link_found = mergedData1.links.findIndex((elem) =>{
+						return (elem.source === link_source && elem.target === link_target) || (elem.source === link_target && elem.target === link_source);
+					})
+					if(link_source === -1 || link_target === -1){
+						//The link belongs to a filltered node
+						console.log("skipped link");
+						return;
+					}
+
+					if(link_found === -1){
+						mergedData1.links.push({
+							"source": link_source,
+							"target": link_target,
+							"value": link.value
+						});
+					} else {
+						mergedData1.links[link_found].value += link.value;
+					}
+				})
+			}
+			if(showEpisode[7+episode]){
+
+				// links for the second graph
+				data[episode].links.forEach(link =>{
+					
 					link_source = mergedData2.nodes.findIndex((elem) =>{ 
 						return elem.name === data[episode].nodes[link.source].name;
 					})
@@ -109,8 +196,13 @@ function loadData(){
 					link_found = mergedData2.links.findIndex((elem) =>{
 						return (elem.source === link_source && elem.target === link_target) || (elem.source === link_target && elem.target === link_source);
 					})
-					//console.log(link_source);
-					//console.log(link_target);
+					
+					if(link_source === -1 || link_target === -1){
+						//The link belongs to a filltered node
+						console.log("skipped link");
+						return;
+					}
+
 					if(link_found === -1){
 						mergedData2.links.push({
 							"source": link_source,
@@ -123,63 +215,40 @@ function loadData(){
 				})
 			}
 		}
-		console.log(mergedData1);
+
+		//console.log(mergedData1);
 		nodes = mergedData1.nodes;
 		links = mergedData1.links;
-		var simulation = d3.forceSimulation(nodes)
-		.force('charge', d3.forceManyBody().strength(-300))
+		simulation1 = d3.forceSimulation(nodes)
+		.force('charge', d3.forceManyBody().strength(-500))
 		.force('center', d3.forceCenter(width / 2, height / 2))
 		.force('link', d3.forceLink().links(links))
 		.on('tick', function(d) {
 			ticked('.nodes',nodes,'.links',links);
 		})
+		.restart()
 
-		console.log(mergedData2);
+		//console.log(mergedData2);
 		nodes2 = mergedData2.nodes;
 		links2 = mergedData2.links;
-		var simulation = d3.forceSimulation(nodes2)
-		.force('charge', d3.forceManyBody().strength(-100))
+		simulation2 = d3.forceSimulation(nodes2)
+		.force('charge', d3.forceManyBody().strength(-500))
 		.force('center', d3.forceCenter(width / 2, height / 2))
 		.force('link', d3.forceLink().links(links2))
 		.on('tick', function(d) {
 			ticked('.nodes2',nodes2,'.links2',links2);
 		})
+		.restart()
 	})
+	initZoom();
 }
-/*
-var starWarsData1 = "starwars";
-d3.json("/starwars-interactions/starwars-episode-1-interactions-allCharacters.json",).then(function(data){
-	starWarsData1 = data;
-	console.log(starWarsData1);
-	nodes = starWarsData1.nodes;
-	links = starWarsData1.links;
-	var simulation = d3.forceSimulation(nodes)
-	.force('charge', d3.forceManyBody().strength(-300))
-	.force('center', d3.forceCenter(width / 2, height / 2))
-	.force('link', d3.forceLink().links(links))
-	.on('tick', function(d) {
-		ticked('.nodes',nodes,'.links',links);
-	})
-});
 
 
-var starWarsData2 = "starwars";
-var filepath2 = "/starwars-interactions/starwars-full-interactions-allCharacters.json";
-d3.json(filepath2,).then(function(data){
-	starWarsData2 = data;
-	console.log(starWarsData2);
-	nodes2 = starWarsData2.nodes;
-	links2 = starWarsData2.links;
-	//console.log(links2)
-	var simulation = d3.forceSimulation(nodes2)
-	.force('charge', d3.forceManyBody().strength(-100))
-	.force('center', d3.forceCenter(width / 2, height / 2))
-	.force('link', d3.forceLink().links(links2))
-	.on('tick', function(d) {
-		ticked('.nodes2',nodes2,'.links2',links2);
-		})
-});
-*/
+//display settings 
+var link_min_width = 2; 
+var link_scale_width = 0.1;
+var node_min_r = 5;
+var node_scale_r = 0.2;
 
 function updateLinks(links_name,lnk) {
 	u = d3.select(links_name)
@@ -187,9 +256,17 @@ function updateLinks(links_name,lnk) {
 		.data(lnk)
 		.join('line')
 		.style('stroke-width',function(d){
-			return d.value;
+			return link_min_width + d.value*link_scale_width;
 		})
-		.attr('stroke','#000000')
+		.attr('stroke',function(d){
+			if(clickedNode === ""){
+				return "#000000"
+			} else{
+				if(d.source.name === clickedNode || d.target.name === clickedNode){
+					return nodeColor;
+				}
+			}
+		})
 		.attr('opacity',0.5)
 		.attr('x1', function(d) {
 			return d.source.x
@@ -216,7 +293,7 @@ function updateLinks(links_name,lnk) {
 			Tooltip.style('opacity', 1)
 			d3.select(this)
 			.style("stroke-width", function(d) {
-				return d3.max([d.value*3,10]);
+				return (link_min_width + d.value*link_scale_width)*2;
 			})
 		})
 		.on("mousemove", function(d) {
@@ -226,9 +303,11 @@ function updateLinks(links_name,lnk) {
 		})
 		.on("mouseleave", function() {
 			Tooltip.style("opacity", 0)
+			.style("left", -100 + "px")
+      		.style("top", -100 + "px")
 			d3.select(this)
 			.style('stroke-width',function(d){
-				return d.value;
+				return link_min_width + d.value*link_scale_width;
 			})
 		});
 		
@@ -240,10 +319,18 @@ function updateNodes(nodes_name,nd) {
 		.data(nd)
 		.join('circle')
 		.attr('r', function(d){
-			return d3.max([d.value*0.1,5]);
+			return node_min_r + d.value*node_scale_r;
 		})
 		.attr('fill',function(d){
 			return d.colour
+		})
+		.attr('opacity', function(d){
+			if(clickedNode === ""){
+				return 1;
+			}
+			else{
+				return (d.name === clickedNode) ? 1 : 0.5;
+			}
 		})
 		.attr('cx', function(d) {
 			return d.x
@@ -268,7 +355,7 @@ function updateNodes(nodes_name,nd) {
 				});
 				
 				//link Color
-				var nodeColor = d3.select(this).attr('fill');
+				nodeColor = d3.select(this).attr('fill');
 				d3.selectAll('line').attr('stroke', function(d){
 					if(d.source.name === clickedNode || d.target.name === clickedNode){
 						return nodeColor;
@@ -300,6 +387,8 @@ function updateNodes(nodes_name,nd) {
 		})
 		.on("mouseleave", function() {
 			Tooltip.style("opacity", 0)
+			.style("left", -100 + "px")
+      		.style("top", -100 + "px")
 			d3.select(this)
 			.style("stroke", "none")
 		});
@@ -316,10 +405,21 @@ function checkbox(checkbox) {
 	loadData();
 }
 
-function zoom(slider) {
-	if (slider.id === "slider1") {
-		zoom1.style("transform", "scale(" + slider.value + ")")
+
+function updateFilter(slider){
+	console.log(slider);
+	if (slider.id === "filterslider1") {
+		min_appearences_thr1 = slider.value;
 	} else {
-		zoom2.style("transform", "scale(" + slider.value + ")")
+		min_appearences_thr2 = slider.value;
+	}
+	loadData();
+}
+
+function sliderIn(slider) {
+	if (slider.id === "filterslider1") {
+		d3.select('#slider1text').html(slider.value)
+	} else {
+		d3.select('#slider2text').html(slider.value)
 	}
 }
